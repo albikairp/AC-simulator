@@ -1,0 +1,6 @@
+{
+  "name": "AC Capacity & Electricity Cost Simulator",
+  "description": "Kalkulator Simulasi PK AC & Biaya Listrik interaktif lengkap dengan pemodelan beban termal ruangan, perbandingan 5 kapasitas PK AC, dan visualisasi biaya Chart.js.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

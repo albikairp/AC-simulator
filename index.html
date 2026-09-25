@@ -1,0 +1,1259 @@
+<!doctype html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AC Capacity & Electricity Cost Simulator (Kalkulator Simulasi PK AC & Biaya Listrik)</title>
+  <meta name="description" content="Kalkulator simulasi kebutuhan PK AC, perhitungan kapasitas BTU/h, dan estimasi biaya tagihan listrik PLN bulanan serta tahunan." />
+  <meta property="og:title" content="AC Capacity & Electricity Cost Simulator" />
+  <meta property="og:description" content="Simulasi kapasitas BTU, rekomendasi PK AC, dan perhitungan biaya listrik PLN." />
+  <meta property="og:type" content="website" />
+  <meta name="twitter:card" content="summary_large_image" />
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#eff6ff',
+              100: '#dbeafe',
+              200: '#bfdbfe',
+              300: '#93c5fd',
+              400: '#60a5fa',
+              500: '#3b82f6',
+              600: '#2563eb',
+              700: '#1d4ed8',
+              800: '#1e40af',
+              900: '#1e3a8a',
+              950: '#172554',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      height: 18px;
+      width: 18px;
+      border-radius: 50%;
+      background: #2563eb;
+      cursor: pointer;
+      -webkit-appearance: none;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      height: 6px;
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen">
+  <!-- Top Navigation Bar -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-cyan-500 flex items-center justify-center text-white shadow-md shadow-blue-500/20">
+          <!-- Snowflake / AC Icon -->
+          <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v20m0-10l4-4m-4 4l-4-4m4 4l4 4m-4-4l-4 4M2 12h20M7 7l10 10M17 7L7 17" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg sm:text-xl font-bold tracking-tight text-slate-900 leading-tight">
+            Kalkulator PK AC & Biaya Listrik
+          </h1>
+          <p class="text-xs text-slate-500 font-medium hidden sm:block">
+            AC Capacity & Electricity Cost Simulator • HVAC Heat Load Engine
+          </p>
+        </div>
+      </div>
+
+      <div class="flex items-center space-x-2 sm:space-x-3">
+        <button id="btnReset" class="inline-flex items-center space-x-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+          </svg>
+          <span class="hidden xs:inline">Reset Default</span>
+        </button>
+        <button id="btnPrint" class="inline-flex items-center space-x-1.5 text-xs font-semibold px-3 py-2 rounded-lg bg-blue-50 hover:bg-blue-100 text-blue-700 transition border border-blue-200">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+          </svg>
+          <span>Cetak / PDF</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Layout -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+      
+      <!-- ================= LEFT COLUMN: INPUT CONTROLS ================= -->
+      <aside class="lg:col-span-4 xl:col-span-4 space-y-6">
+        
+        <!-- Room Presets Quick Select -->
+        <div class="bg-white rounded-2xl p-5 border border-slate-200/80 shadow-xs">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold uppercase tracking-wider text-slate-500 flex items-center gap-1.5">
+              <svg class="w-4 h-4 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+              Preset Ruangan Cepat
+            </h2>
+            <span class="text-[10px] font-semibold bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full">Shortcut</span>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-xs">
+            <button type="button" onclick="applyPreset('kamar_kecil')" class="preset-btn text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition">
+              <span class="font-semibold block text-slate-800">Kamar Tidur 3x3</span>
+              <span class="text-slate-500 text-[11px]">9 m² • 1 Orang</span>
+            </button>
+            <button type="button" onclick="applyPreset('kamar_utama')" class="preset-btn text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition">
+              <span class="font-semibold block text-slate-800">Kamar Utama 4x4</span>
+              <span class="text-slate-500 text-[11px]">16 m² • 2 Orang</span>
+            </button>
+            <button type="button" onclick="applyPreset('ruang_tamu')" class="preset-btn text-left p-2.5 rounded-xl border border-blue-500 bg-blue-50/60 transition">
+              <span class="font-semibold block text-blue-900">Ruang Keluarga 4x6</span>
+              <span class="text-blue-700 text-[11px]">24 m² • Default</span>
+            </button>
+            <button type="button" onclick="applyPreset('kantor')" class="preset-btn text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition">
+              <span class="font-semibold block text-slate-800">Studio / Ruko 5x8</span>
+              <span class="text-slate-500 text-[11px]">40 m² • 4 Orang</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- FORM CONTROLS PANEL -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs divide-y divide-slate-100">
+          
+          <!-- SECTION A: Room Geometry & Heat Load -->
+          <div class="p-5 space-y-4">
+            <div class="flex items-center space-x-2 text-slate-900">
+              <span class="w-6 h-6 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">A</span>
+              <h3 class="font-bold text-base">Geometri & Beban Termal</h3>
+            </div>
+
+            <!-- Length & Width -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Panjang (m)</span>
+                  <span id="labelLengthVal" class="text-blue-600 font-mono">4.0 m</span>
+                </label>
+                <input type="number" id="inputLength" min="1" max="30" step="0.5" value="4" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Lebar (m)</span>
+                  <span id="labelWidthVal" class="text-blue-600 font-mono">6.0 m</span>
+                </label>
+                <input type="number" id="inputWidth" min="1" max="30" step="0.5" value="6" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+              </div>
+            </div>
+
+            <!-- Height -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                <span>Tinggi Plafon (m)</span>
+                <span id="labelHeightVal" class="text-blue-600 font-mono">3.0 m</span>
+              </label>
+              <div class="flex items-center space-x-3">
+                <input type="range" id="sliderHeight" min="2" max="6" step="0.1" value="3.0" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                <input type="number" id="inputHeight" min="2" max="6" step="0.1" value="3" class="w-20 px-2 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 focus:outline-none text-right">
+              </div>
+            </div>
+
+            <!-- Base Heat Multiplier -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-semibold text-slate-700 flex items-center gap-1">
+                  <span>Faktor Beban Panas</span>
+                  <span class="text-slate-400 cursor-help" title="Standar Indonesia: 500 (ruang sejuk/lantai bawah), 600 (iklim puncak 35-36°C), 700 (bawah atap langsung/kaca luas)">ⓘ</span>
+                </label>
+                <span id="labelMultiplierVal" class="text-xs font-mono font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded">600 BTU/m²</span>
+              </div>
+              <input type="range" id="sliderMultiplier" min="450" max="800" step="25" value="600" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1 font-medium">
+                <span>500 (Sejuk/Teduh)</span>
+                <span class="font-bold text-slate-600">600 (Puncak 35-36°C)</span>
+                <span>750 (Lantai Atas Panas)</span>
+              </div>
+            </div>
+
+            <!-- Window Sun Exposure -->
+            <div>
+              <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                <span>Beban Kaca & Matahari (BTU/h)</span>
+                <span id="labelWindowVal" class="text-blue-600 font-mono">1000 BTU/h</span>
+              </label>
+              <input type="number" id="inputWindow" min="0" max="8000" step="100" value="1000" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+              <p class="text-[10px] text-slate-400 mt-1">Estimasi: Jendela standar tertutup gordyn ±500-1000 BTU/h, kaca langsung barat ±2000 BTU/h.</p>
+            </div>
+
+            <!-- Occupants & Electronics -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                  Jumlah Orang (+400/org)
+                </label>
+                <div class="flex items-center rounded-xl border border-slate-200 bg-slate-50 overflow-hidden">
+                  <button type="button" onclick="stepOccupants(-1)" class="px-3 py-2 text-slate-600 hover:bg-slate-200 font-bold transition">−</button>
+                  <input type="number" id="inputOccupants" min="1" max="25" value="2" class="w-full text-center bg-transparent border-0 text-sm font-semibold focus:outline-none">
+                  <button type="button" onclick="stepOccupants(1)" class="px-3 py-2 text-slate-600 hover:bg-slate-200 font-bold transition">+</button>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1">
+                  Beban Elektronik
+                </label>
+                <div class="relative">
+                  <input type="number" id="inputElectronics" min="0" max="5000" step="50" value="500" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                  <span class="absolute right-2.5 top-2.5 text-[10px] font-mono text-slate-400 pointer-events-none">BTU/h</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SECTION B: Financials & Utility Rates -->
+          <div class="p-5 space-y-4">
+            <div class="flex items-center space-x-2 text-slate-900">
+              <span class="w-6 h-6 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xs">B</span>
+              <h3 class="font-bold text-base">Tarif Listrik PLN & Pemakaian</h3>
+            </div>
+
+            <!-- PLN Tariff Presets & Input -->
+            <div>
+              <div class="flex items-center justify-between mb-1">
+                <label class="text-xs font-semibold text-slate-700">Tarif PLN (Rp/kWh)</label>
+                <span class="text-[11px] text-emerald-600 font-bold font-mono" id="tariffTag">R-1 Non-Subsidi</span>
+              </div>
+              <div class="grid grid-cols-3 gap-1.5 mb-2 text-[10px]">
+                <button type="button" onclick="setTariff(1352.00, '900 VA RTM')" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-center font-medium">
+                  900 VA (Rp 1.352)
+                </button>
+                <button type="button" onclick="setTariff(1444.70, '1300-2200 VA')" class="p-1.5 rounded-lg border border-emerald-400 bg-emerald-50 text-emerald-800 text-center font-bold">
+                  1300-2200 VA (Rp 1.444)
+                </button>
+                <button type="button" onclick="setTariff(1699.53, '3500-5500 VA')" class="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-center font-medium">
+                  3500+ VA (Rp 1.700)
+                </button>
+              </div>
+              <div class="relative">
+                <span class="absolute left-3 top-2 text-xs font-bold text-slate-400">Rp</span>
+                <input type="number" id="inputTariff" step="0.1" value="1444.70" class="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 transition">
+              </div>
+            </div>
+
+            <!-- Daily Hours & Days per month -->
+            <div class="grid grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Jam Pakai/Hari</span>
+                  <span id="labelHoursVal" class="text-emerald-700 font-mono font-bold">10 Jam</span>
+                </label>
+                <input type="range" id="sliderHours" min="1" max="24" step="1" value="10" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                  <span>1 Jam</span>
+                  <span>12 Jam</span>
+                  <span>24 Jam</span>
+                </div>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold text-slate-700 mb-1 flex items-center justify-between">
+                  <span>Hari/Bulan</span>
+                  <span id="labelDaysVal" class="text-emerald-700 font-mono font-bold">30 Hari</span>
+                </label>
+                <input type="range" id="sliderDays" min="1" max="31" step="1" value="30" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                  <span>1 Hari</span>
+                  <span>20 Hari</span>
+                  <span>30 Hari</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SECTION C: Operational Mode Toggle -->
+          <div class="p-5 space-y-4 bg-gradient-to-b from-transparent to-blue-50/40 rounded-b-2xl">
+            <div class="flex items-center space-x-2 text-slate-900">
+              <span class="w-6 h-6 rounded-lg bg-indigo-100 text-indigo-700 flex items-center justify-center font-bold text-xs">C</span>
+              <h3 class="font-bold text-base">Mode Operasional & Optimasi</h3>
+            </div>
+
+            <!-- Mode Selector Switch -->
+            <div class="bg-slate-100 p-1 rounded-xl flex items-center space-x-1">
+              <button type="button" id="btnModeStandard" onclick="setMode('standard')" class="flex-1 py-2 px-2 rounded-lg text-xs font-bold transition shadow-xs bg-white text-slate-900">
+                1. Mode Standar 26°C
+              </button>
+              <button type="button" id="btnModeFanHack" onclick="setMode('fan')" class="flex-1 py-2 px-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900">
+                2. Hack 28°C + Kipas Angin 🍃
+              </button>
+            </div>
+
+            <!-- Fan Hack Explainer / Controls (hidden when standard) -->
+            <div id="fanSettingsBox" class="p-3 bg-white rounded-xl border border-indigo-200 shadow-2xs space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-indigo-900 flex items-center gap-1.5">
+                  <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Daya Kipas Angin (Standing/Ceiling)
+                </span>
+                <span id="labelFanWatts" class="text-xs font-mono font-bold text-indigo-600">25 Watt</span>
+              </div>
+              <div class="flex items-center space-x-3">
+                <input type="range" id="sliderFanWatts" min="10" max="80" step="5" value="25" class="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                <input type="number" id="inputFanWatts" min="5" max="150" value="25" class="w-16 px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 text-right">
+              </div>
+              <p class="text-[11px] text-slate-500 leading-relaxed">
+                <strong class="text-indigo-900 font-semibold">Trik Hemat Energi:</strong> Menyetel AC di 28°C ditambah hembusan kipas (wind chill effect) memberikan sensasi kenyamanan setara 24–25°C, namun memangkas beban kompresor rata-rata <strong class="text-emerald-600">20%–40%</strong>!
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- HVAC Quick Tip Card -->
+        <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white p-4 rounded-2xl shadow-sm">
+          <div class="flex items-start space-x-3">
+            <div class="p-2 bg-blue-500/20 rounded-xl text-blue-400">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <div class="space-y-1">
+              <h4 class="text-xs font-bold uppercase tracking-wider text-slate-300">Prinsip Duty Cycle Kompresor</h4>
+              <p class="text-[11px] text-slate-400 leading-relaxed">
+                AC dengan kapasitas pas-pasan (0.5 PK di ruang besar) akan bekerja pada duty cycle 100% tanpa henti, memboroskan listrik dan cepat aus. Memilih kapasitas cukup (recommended) memastikan kompresor dapat beristirahat (cycling) dan jauh lebih awet.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </aside>
+
+      <!-- ================= RIGHT COLUMN: DASHBOARD VISUAL OUTPUTS ================= -->
+      <section class="lg:col-span-8 xl:col-span-8 space-y-6">
+        
+        <!-- SECTION 4.A: SUMMARY BANNER -->
+        <div class="bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white rounded-3xl p-6 sm:p-7 shadow-xl border border-blue-900/40 relative overflow-hidden">
+          <!-- Background decoration -->
+          <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+          <div class="absolute top-0 right-1/4 w-32 h-32 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none"></div>
+
+          <div class="relative z-10">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <div class="inline-flex items-center space-x-2 bg-blue-500/20 backdrop-blur-xs border border-blue-400/30 px-3 py-1 rounded-full text-xs font-semibold text-blue-200">
+                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+                <span>Hasil Kalkulasi Beban Pendinginan Ruangan</span>
+              </div>
+              <span id="bannerModeBadge" class="text-xs font-semibold bg-white/10 px-3 py-1 rounded-full text-slate-200">
+                Mode Standar 26°C
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 lg:gap-6 mt-4">
+              <!-- Room Area -->
+              <div class="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div class="text-xs font-medium text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Luas Lantai</span>
+                  <svg class="w-4 h-4 text-cyan-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+                  </svg>
+                </div>
+                <div class="flex items-baseline space-x-1.5">
+                  <span id="resFloorArea" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">24.0</span>
+                  <span class="text-sm font-semibold text-slate-300">m²</span>
+                </div>
+                <p id="resFloorDim" class="text-[11px] text-slate-400 mt-1 font-mono">4.0 m × 6.0 m</p>
+              </div>
+
+              <!-- Room Volume -->
+              <div class="bg-white/5 backdrop-blur-md rounded-2xl p-4 border border-white/10">
+                <div class="text-xs font-medium text-slate-300 mb-1 flex items-center justify-between">
+                  <span>Volume Ruangan</span>
+                  <svg class="w-4 h-4 text-indigo-400 opacity-80" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  </svg>
+                </div>
+                <div class="flex items-baseline space-x-1.5">
+                  <span id="resVolume" class="text-2xl sm:text-3xl font-extrabold text-white font-mono">72.0</span>
+                  <span class="text-sm font-semibold text-slate-300">m³</span>
+                </div>
+                <p id="resHeightDim" class="text-[11px] text-slate-400 mt-1 font-mono">Tinggi: 3.0 m</p>
+              </div>
+
+              <!-- Total Required BTU/h -->
+              <div class="bg-gradient-to-br from-blue-600/40 to-cyan-600/30 backdrop-blur-md rounded-2xl p-4 border border-cyan-400/30">
+                <div class="text-xs font-medium text-cyan-200 mb-1 flex items-center justify-between">
+                  <span>Total Kebutuhan Beban</span>
+                  <span class="text-[10px] bg-cyan-400/20 text-cyan-200 px-1.5 py-0.5 rounded font-bold">Wajib Diimbangi</span>
+                </div>
+                <div class="flex items-baseline space-x-1.5">
+                  <span id="resRequiredBTU" class="text-2xl sm:text-3xl font-extrabold text-cyan-300 font-mono tracking-tight">16,700</span>
+                  <span class="text-xs font-semibold text-cyan-100">BTU/h</span>
+                </div>
+                <p id="resRecommendedPKBanner" class="text-[11px] text-emerald-300 mt-1 font-semibold flex items-center gap-1">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>Rekomendasi Minimum: <strong id="recPKName" class="text-white">2.0 PK</strong></span>
+                </p>
+              </div>
+            </div>
+
+            <!-- Heat Load Breakdown Pills -->
+            <div class="mt-4 pt-3 border-t border-white/10 flex flex-wrap items-center gap-2 text-[11px] text-slate-300">
+              <span class="text-slate-400">Rincian Beban Termal:</span>
+              <span class="bg-white/10 px-2.5 py-1 rounded-lg">Luas × Faktor: <strong id="bdAreaBTU" class="text-white font-mono">14,400</strong> BTU</span>
+              <span class="bg-white/10 px-2.5 py-1 rounded-lg">Jendela/Matahari: <strong id="bdWindowBTU" class="text-white font-mono">1,000</strong> BTU</span>
+              <span class="bg-white/10 px-2.5 py-1 rounded-lg">Orang: <strong id="bdPeopleBTU" class="text-white font-mono">800</strong> BTU</span>
+              <span class="bg-white/10 px-2.5 py-1 rounded-lg">Elektronik: <strong id="bdElectronicsBTU" class="text-white font-mono">500</strong> BTU</span>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- SECTION 4.B: COMPARISON CARDS GRID (5 Cards Side-by-Side) -->
+        <div>
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">
+                Perbandingan 5 Kapasitas Horsepower (PK) AC
+              </h2>
+              <p class="text-xs text-slate-500">
+                Pilih opsi paling hemat biaya dan memadai secara kapasitas termal untuk mencegah kompresor overload.
+              </p>
+            </div>
+            <span class="hidden sm:inline-flex items-center gap-1 text-xs font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+              ★ Ditandai = Rekomendasi Paling Pas
+            </span>
+          </div>
+
+          <!-- Cards Grid -->
+          <div id="cardsContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5">
+            <!-- Dynamic Cards Injected via JS -->
+          </div>
+        </div>
+
+        <!-- SECTION 4.C: INTERACTIVE CHART.JS BAR CHART -->
+        <div class="bg-white rounded-2xl p-5 sm:p-6 border border-slate-200/80 shadow-xs space-y-4">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900">
+                Grafik Perbandingan Biaya Listrik Bulanan & Beban Daya
+              </h3>
+              <p class="text-xs text-slate-500">
+                Simulasi tagihan PLN per bulan untuk tiap ukuran PK pada mode yang sedang aktif.
+              </p>
+            </div>
+            <div class="inline-flex rounded-xl bg-slate-100 p-1 text-xs font-semibold">
+              <button type="button" id="chartTabBill" onclick="switchChartMetric('bill')" class="px-3 py-1.5 rounded-lg bg-white shadow-xs text-blue-700 font-bold transition">
+                Tagihan Bulanan (Rp)
+              </button>
+              <button type="button" id="chartTabYear1" onclick="switchChartMetric('year1')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">
+                Total Biaya Thn-1 (Unit + Listrik)
+              </button>
+              <button type="button" id="chartTabPower" onclick="switchChartMetric('power')" class="px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition">
+                Daya Nyata (Watt)
+              </button>
+            </div>
+          </div>
+
+          <!-- Canvas Container -->
+          <div class="relative h-64 sm:h-72 w-full">
+            <canvas id="costComparisonChart"></canvas>
+          </div>
+
+          <!-- Energy Saving Highlights Alert if Hack Mode is ON or togglable -->
+          <div id="savingsNoticeBox" class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-between text-xs text-emerald-900">
+            <div class="flex items-center space-x-2.5">
+              <span class="w-8 h-8 rounded-lg bg-emerald-200/60 text-emerald-800 flex items-center justify-center font-bold text-base">💰</span>
+              <div>
+                <p class="font-bold text-emerald-900" id="savingsNoticeTitle">
+                  Hemat Listrik dengan Trik 28°C + Kipas Angin
+                </p>
+                <p class="text-emerald-700 text-[11px]" id="savingsNoticeDesc">
+                  Aktifkan mode hack untuk melihat penghematan hingga ratusan ribu per bulan!
+                </p>
+              </div>
+            </div>
+            <button type="button" id="btnToggleHackFromBanner" onclick="toggleHackMode()" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition shrink-0">
+              Coba Hack 28°C
+            </button>
+          </div>
+        </div>
+
+        <!-- SECTION 4.D: DETAILED COMPARISON TABLE -->
+        <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
+          <div class="p-5 border-b border-slate-100 flex items-center justify-between flex-wrap gap-2">
+            <div>
+              <h3 class="text-sm sm:text-base font-bold text-slate-900">
+                Tabel Rincian Kalkulasi Komprehensif
+              </h3>
+              <p class="text-xs text-slate-500">
+                Metrik teknis kompresor, konsumsi kWh, serta breakdown finansial tahun pertama.
+              </p>
+            </div>
+            <button onclick="copyTableData()" class="inline-flex items-center space-x-1.5 text-xs font-semibold px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 transition">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+              </svg>
+              <span>Salin Ringkasan</span>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="w-full text-left text-xs whitespace-nowrap">
+              <thead class="bg-slate-50 text-slate-600 font-semibold border-b border-slate-200 uppercase tracking-wider text-[11px]">
+                <tr>
+                  <th scope="col" class="py-3 px-4">Rating PK</th>
+                  <th scope="col" class="py-3 px-4">Kapasitas BTU</th>
+                  <th scope="col" class="py-3 px-4 text-center">Status Cukup?</th>
+                  <th scope="col" class="py-3 px-4 text-right">Duty Cycle</th>
+                  <th scope="col" class="py-3 px-4 text-right">Rata-rata Watt</th>
+                  <th scope="col" class="py-3 px-4 text-right">kWh / Bulan</th>
+                  <th scope="col" class="py-3 px-4 text-right">Tagihan Bulanan</th>
+                  <th scope="col" class="py-3 px-4 text-right">Tagihan Tahunan</th>
+                  <th scope="col" class="py-3 px-4 text-right">Harga Unit + Pasang</th>
+                  <th scope="col" class="py-3 px-4 text-right">Total Biaya Thn-1</th>
+                </tr>
+              </thead>
+              <tbody id="comparisonTableBody" class="divide-y divide-slate-100 font-medium text-slate-700">
+                <!-- Dynamically generated rows -->
+              </tbody>
+            </table>
+          </div>
+
+          <div class="p-4 bg-slate-50 border-t border-slate-200 text-[11px] text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <span>* Simulasi dihitung berdasarkan standar kompresor inverter/non-inverter bertahap dan parameter beban termal ruangan.</span>
+            <span class="font-mono text-slate-400">PLN: Rp <span id="footerTariff">1444.70</span>/kWh</span>
+          </div>
+        </div>
+
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none bg-slate-900 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-lg flex items-center space-x-2">
+    <svg class="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+    </svg>
+    <span id="toastMsg">Tersalin ke clipboard!</span>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    // -------------------------------------------------------------
+    // DATA CONSTANTS & HARDCODED HARDWARE OPTIONS
+    // -------------------------------------------------------------
+    const AC_OPTIONS = [
+      {
+        id: '0.5pk',
+        name: '0.5 PK',
+        pkValue: 0.5,
+        btu: 5000,
+        maxPower: 400,
+        cost: 3500000,
+        dutyStandard: 1.00, // 100%
+        dutyFan: 0.80       // 80%
+      },
+      {
+        id: '0.75pk',
+        name: '0.75 PK',
+        pkValue: 0.75,
+        btu: 7000,
+        maxPower: 600,
+        cost: 4500000,
+        dutyStandard: 0.85, // 85%
+        dutyFan: 0.60       // 60%
+      },
+      {
+        id: '1.0pk',
+        name: '1.0 PK',
+        pkValue: 1.0,
+        btu: 9000,
+        maxPower: 840,
+        cost: 5500000,
+        dutyStandard: 0.70, // 70%
+        dutyFan: 0.45       // 45%
+      },
+      {
+        id: '1.5pk',
+        name: '1.5 PK',
+        pkValue: 1.5,
+        btu: 12000,
+        maxPower: 1100,
+        cost: 6500000,
+        dutyStandard: 0.55, // 55%
+        dutyFan: 0.30       // 30%
+      },
+      {
+        id: '2.0pk',
+        name: '2.0 PK',
+        pkValue: 2.0,
+        btu: 18000,
+        maxPower: 1600,
+        cost: 7500000,
+        dutyStandard: 0.35, // 35%
+        dutyFan: 0.20       // 20%
+      }
+    ];
+
+    // Presets for Rooms
+    const PRESETS = {
+      kamar_kecil: { length: 3, width: 3, height: 2.8, multiplier: 550, window: 600, occupants: 1, electronics: 300 },
+      kamar_utama: { length: 4, width: 4, height: 3.0, multiplier: 600, window: 1000, occupants: 2, electronics: 500 },
+      ruang_tamu: { length: 4, width: 6, height: 3.0, multiplier: 600, window: 1000, occupants: 2, electronics: 500 },
+      kantor: { length: 5, width: 8, height: 3.2, multiplier: 650, window: 1500, occupants: 4, electronics: 1200 }
+    };
+
+    // State Variables
+    let currentMode = 'standard'; // 'standard' or 'fan'
+    let currentChartMetric = 'bill'; // 'bill', 'year1', 'power'
+    let chartInstance = null;
+
+    // DOM Elements
+    const inputLength = document.getElementById('inputLength');
+    const inputWidth = document.getElementById('inputWidth');
+    const inputHeight = document.getElementById('inputHeight');
+    const sliderHeight = document.getElementById('sliderHeight');
+    const sliderMultiplier = document.getElementById('sliderMultiplier');
+    const inputWindow = document.getElementById('inputWindow');
+    const inputOccupants = document.getElementById('inputOccupants');
+    const inputElectronics = document.getElementById('inputElectronics');
+    const inputTariff = document.getElementById('inputTariff');
+    const sliderHours = document.getElementById('sliderHours');
+    const sliderDays = document.getElementById('sliderDays');
+    const sliderFanWatts = document.getElementById('sliderFanWatts');
+    const inputFanWatts = document.getElementById('inputFanWatts');
+
+    // Labels
+    const labelLengthVal = document.getElementById('labelLengthVal');
+    const labelWidthVal = document.getElementById('labelWidthVal');
+    const labelHeightVal = document.getElementById('labelHeightVal');
+    const labelMultiplierVal = document.getElementById('labelMultiplierVal');
+    const labelWindowVal = document.getElementById('labelWindowVal');
+    const labelHoursVal = document.getElementById('labelHoursVal');
+    const labelDaysVal = document.getElementById('labelDaysVal');
+    const labelFanWatts = document.getElementById('labelFanWatts');
+    const tariffTag = document.getElementById('tariffTag');
+    const footerTariff = document.getElementById('footerTariff');
+
+    // Outputs
+    const resFloorArea = document.getElementById('resFloorArea');
+    const resFloorDim = document.getElementById('resFloorDim');
+    const resVolume = document.getElementById('resVolume');
+    const resHeightDim = document.getElementById('resHeightDim');
+    const resRequiredBTU = document.getElementById('resRequiredBTU');
+    const recPKName = document.getElementById('recPKName');
+    const bannerModeBadge = document.getElementById('bannerModeBadge');
+    const bdAreaBTU = document.getElementById('bdAreaBTU');
+    const bdWindowBTU = document.getElementById('bdWindowBTU');
+    const bdPeopleBTU = document.getElementById('bdPeopleBTU');
+    const bdElectronicsBTU = document.getElementById('bdElectronicsBTU');
+
+    // Containers
+    const cardsContainer = document.getElementById('cardsContainer');
+    const comparisonTableBody = document.getElementById('comparisonTableBody');
+    const fanSettingsBox = document.getElementById('fanSettingsBox');
+    const btnModeStandard = document.getElementById('btnModeStandard');
+    const btnModeFanHack = document.getElementById('btnModeFanHack');
+    const savingsNoticeTitle = document.getElementById('savingsNoticeTitle');
+    const savingsNoticeDesc = document.getElementById('savingsNoticeDesc');
+    const btnToggleHackFromBanner = document.getElementById('btnToggleHackFromBanner');
+
+    // Formatting Helpers
+    function formatNumber(num) {
+      return new Intl.NumberFormat('id-ID').format(Math.round(num));
+    }
+
+    function formatCurrency(amount) {
+      return 'Rp ' + new Intl.NumberFormat('id-ID').format(Math.round(amount));
+    }
+
+    // Initialize Chart
+    function initChart() {
+      const ctx = document.getElementById('costComparisonChart').getContext('2d');
+      chartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: AC_OPTIONS.map(o => o.name),
+          datasets: [
+            {
+              label: 'Biaya Bulanan (IDR)',
+              data: [0, 0, 0, 0, 0],
+              backgroundColor: AC_OPTIONS.map(() => '#3b82f6'),
+              borderRadius: 8,
+              borderWidth: 0,
+              hoverBackgroundColor: '#1d4ed8'
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleFont: { size: 13, family: 'Inter', weight: 'bold' },
+              bodyFont: { size: 12, family: 'Inter' },
+              padding: 12,
+              cornerRadius: 10,
+              callbacks: {
+                label: function(context) {
+                  const val = context.raw || 0;
+                  if (currentChartMetric === 'bill' || currentChartMetric === 'year1') {
+                    return ' ' + formatCurrency(val);
+                  }
+                  return ' ' + formatNumber(val) + ' Watt';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: '#f1f5f9'
+              },
+              ticks: {
+                color: '#64748b',
+                font: { family: 'Inter', size: 11 },
+                callback: function(value) {
+                  if (currentChartMetric === 'bill' || currentChartMetric === 'year1') {
+                    if (value >= 1000000) {
+                      return 'Rp ' + (value / 1000000).toFixed(1) + ' jt';
+                    }
+                    return 'Rp ' + (value / 1000).toFixed(0) + ' rb';
+                  }
+                  return value + ' W';
+                }
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: '#334155',
+                font: { family: 'Inter', size: 12, weight: '600' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // -------------------------------------------------------------
+    // CALCULATION ENGINE
+    // -------------------------------------------------------------
+    function calculateSimulations() {
+      // 1. Inputs
+      const length = Math.max(0.5, parseFloat(inputLength.value) || 0);
+      const width = Math.max(0.5, parseFloat(inputWidth.value) || 0);
+      const height = Math.max(1, parseFloat(inputHeight.value) || 0);
+      const baseMultiplier = parseFloat(sliderMultiplier.value) || 600;
+      const windowLoad = Math.max(0, parseFloat(inputWindow.value) || 0);
+      const occupants = Math.max(0, parseInt(inputOccupants.value, 10) || 0);
+      const equipmentLoad = Math.max(0, parseFloat(inputElectronics.value) || 0);
+
+      const tariff = Math.max(0, parseFloat(inputTariff.value) || 0);
+      const dailyHours = Math.max(0, Math.min(24, parseFloat(sliderHours.value) || 0));
+      const daysPerMonth = Math.max(0, Math.min(31, parseFloat(sliderDays.value) || 0));
+      const fanWatts = currentMode === 'fan' ? (parseFloat(sliderFanWatts.value) || 0) : 0;
+
+      // Update sync labels
+      labelLengthVal.textContent = length.toFixed(1) + ' m';
+      labelWidthVal.textContent = width.toFixed(1) + ' m';
+      labelHeightVal.textContent = height.toFixed(1) + ' m';
+      sliderHeight.value = height;
+      labelMultiplierVal.textContent = baseMultiplier + ' BTU/m²';
+      labelWindowVal.textContent = formatNumber(windowLoad) + ' BTU/h';
+      labelHoursVal.textContent = dailyHours + ' Jam';
+      labelDaysVal.textContent = daysPerMonth + ' Hari';
+      labelFanWatts.textContent = (sliderFanWatts.value || 25) + ' Watt';
+      footerTariff.textContent = tariff.toFixed(2);
+
+      // 2. Room Math
+      const floorArea = length * width;
+      const roomVolume = floorArea * height;
+      const areaHeatLoad = floorArea * baseMultiplier;
+      const occupantsHeatLoad = occupants * 400;
+      const requiredBTU = areaHeatLoad + windowLoad + occupantsHeatLoad + equipmentLoad;
+
+      // Update Summary Banner
+      resFloorArea.textContent = floorArea.toFixed(1);
+      resFloorDim.textContent = `${length.toFixed(1)} m × ${width.toFixed(1)} m`;
+      resVolume.textContent = roomVolume.toFixed(1);
+      resHeightDim.textContent = `Tinggi Plafon: ${height.toFixed(1)} m`;
+      resRequiredBTU.textContent = formatNumber(requiredBTU);
+
+      bdAreaBTU.textContent = formatNumber(areaHeatLoad);
+      bdWindowBTU.textContent = formatNumber(windowLoad);
+      bdPeopleBTU.textContent = formatNumber(occupantsHeatLoad);
+      bdElectronicsBTU.textContent = formatNumber(equipmentLoad);
+
+      bannerModeBadge.textContent = currentMode === 'fan' ? 'Mode Hack 28°C + Kipas' : 'Mode Standar 26°C';
+
+      // 3. Evaluate each AC Hardware Option
+      let recommendedOption = null;
+
+      const results = AC_OPTIONS.map((opt) => {
+        const isSufficient = opt.btu >= requiredBTU;
+        const dutyCycle = currentMode === 'fan' ? opt.dutyFan : opt.dutyStandard;
+        
+        // Actual Average Power Draw
+        const avgActualWatts = opt.maxPower * dutyCycle;
+        
+        // Daily kWh: (AC avg watts * hours) / 1000 + (Fan watts * hours) / 1000
+        const acDailyKwh = (avgActualWatts * dailyHours) / 1000;
+        const fanDailyKwh = (fanWatts * dailyHours) / 1000;
+        const totalDailyKwh = acDailyKwh + fanDailyKwh;
+
+        // Bills
+        const monthlyKwh = totalDailyKwh * daysPerMonth;
+        const monthlyBill = monthlyKwh * tariff;
+        const annualBill = monthlyBill * 12;
+        const totalYear1Cost = opt.cost + annualBill;
+
+        return {
+          ...opt,
+          isSufficient,
+          dutyCycle,
+          avgActualWatts,
+          totalDailyKwh,
+          monthlyKwh,
+          monthlyBill,
+          annualBill,
+          totalYear1Cost
+        };
+      });
+
+      // Find recommended: smallest PK that satisfies Unit BTU >= Required BTU
+      const sufficientOptions = results.filter(r => r.isSufficient);
+      if (sufficientOptions.length > 0) {
+        // smallest PK that passes
+        recommendedOption = sufficientOptions[0];
+      } else {
+        // None is sufficient, select highest capacity as best fallback
+        recommendedOption = results[results.length - 1];
+      }
+
+      recPKName.textContent = recommendedOption.name;
+
+      // 4. Render Comparison Cards
+      renderCards(results, recommendedOption);
+
+      // 5. Render Comparison Table
+      renderTable(results, recommendedOption);
+
+      // 6. Update Chart
+      updateChart(results, recommendedOption);
+
+      // 7. Update Savings Notice
+      updateSavingsNotice(results, recommendedOption, tariff, dailyHours, daysPerMonth);
+    }
+
+    // -------------------------------------------------------------
+    // RENDER CARDS GRID
+    // -------------------------------------------------------------
+    function renderCards(results, recommendedOption) {
+      cardsContainer.innerHTML = '';
+
+      results.forEach((item) => {
+        const isRec = item.id === recommendedOption.id;
+        const isSufficient = item.isSufficient;
+
+        const card = document.createElement('div');
+        card.className = `relative rounded-2xl p-4 transition-all duration-200 flex flex-col justify-between ${
+          isRec
+            ? 'bg-gradient-to-b from-blue-50/90 to-white border-2 border-blue-500 shadow-md ring-2 ring-blue-400/20'
+            : isSufficient
+            ? 'bg-white border border-slate-200/90 hover:border-slate-300 shadow-2xs hover:shadow-xs'
+            : 'bg-slate-50/70 border border-slate-200 text-slate-500 opacity-90'
+        }`;
+
+        card.innerHTML = `
+          <div>
+            ${
+              isRec
+                ? `<div class="absolute -top-3 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-[10px] uppercase font-extrabold tracking-wider px-2.5 py-0.5 rounded-full shadow-xs flex items-center gap-1">
+                    <span>★ Rekomendasi Pas</span>
+                   </div>`
+                : ''
+            }
+
+            <!-- Header: PK & Sufficiency Badge -->
+            <div class="flex items-center justify-between mb-2 mt-1">
+              <div class="flex items-center space-x-1.5">
+                <span class="text-base font-extrabold text-slate-900">${item.name}</span>
+                <span class="text-[10px] font-mono text-slate-400">${item.maxPower}W</span>
+              </div>
+              <div>
+                ${
+                  isSufficient
+                    ? `<span class="inline-flex items-center gap-1 bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+                        YES Cukup
+                       </span>`
+                    : `<span class="inline-flex items-center gap-1 bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full">
+                        <svg class="w-3 h-3 text-rose-600" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+                        NO Kurang
+                       </span>`
+                }
+              </div>
+            </div>
+
+            <!-- Capacity Info -->
+            <div class="text-xs text-slate-600 flex items-center justify-between pb-2 mb-2 border-b border-slate-100">
+              <span class="text-slate-500">Kapasitas Pendinginan:</span>
+              <span class="font-mono font-bold text-slate-800">${formatNumber(item.btu)} BTU/h</span>
+            </div>
+
+            <!-- Main Metric: Monthly Bill -->
+            <div class="my-2.5">
+              <span class="text-[10px] uppercase font-bold tracking-wider text-slate-400 block">Est. Listrik / Bulan</span>
+              <div class="text-lg font-black text-slate-900 font-mono tracking-tight text-blue-600">
+                ${formatCurrency(item.monthlyBill)}
+              </div>
+              <span class="text-[11px] text-slate-500">
+                (${item.monthlyKwh.toFixed(1)} kWh/bln)
+              </span>
+            </div>
+
+            <!-- Metrics list -->
+            <div class="space-y-1.5 text-[11px] pt-2 border-t border-slate-100 text-slate-600">
+              <div class="flex justify-between">
+                <span>Daya Nyata Rata-rata:</span>
+                <span class="font-mono font-semibold text-slate-800">${Math.round(item.avgActualWatts)} W</span>
+              </div>
+              <div class="flex justify-between">
+                <span>Duty Cycle:</span>
+                <span class="font-mono font-semibold ${item.dutyCycle >= 0.8 ? 'text-amber-600 font-bold' : 'text-slate-800'}">
+                  ${Math.round(item.dutyCycle * 100)}%
+                </span>
+              </div>
+              <div class="flex justify-between">
+                <span>Total Thn-1 (Unit+Listrik):</span>
+                <span class="font-mono font-bold text-slate-900">${formatCurrency(item.totalYear1Cost)}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-3 pt-2 text-[10px] text-slate-400 border-t border-slate-100 flex items-center justify-between">
+            <span>Harga Unit:</span>
+            <span class="font-mono">${formatCurrency(item.cost)}</span>
+          </div>
+        `;
+
+        cardsContainer.appendChild(card);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // RENDER COMPARISON TABLE
+    // -------------------------------------------------------------
+    function renderTable(results, recommendedOption) {
+      comparisonTableBody.innerHTML = '';
+
+      results.forEach((item) => {
+        const isRec = item.id === recommendedOption.id;
+        const row = document.createElement('tr');
+        row.className = `${
+          isRec ? 'bg-blue-50/70 font-semibold text-blue-950' : 'hover:bg-slate-50/80 transition'
+        }`;
+
+        row.innerHTML = `
+          <td class="py-3 px-4 font-bold text-slate-900 flex items-center gap-1.5">
+            ${item.name}
+            ${isRec ? '<span class="bg-blue-600 text-white text-[9px] px-1.5 py-0.5 rounded font-bold">REKOMENDASI</span>' : ''}
+          </td>
+          <td class="py-3 px-4 font-mono text-slate-800">${formatNumber(item.btu)} BTU/h</td>
+          <td class="py-3 px-4 text-center">
+            ${
+              item.isSufficient
+                ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-0.5">
+                    ✓ Cukup
+                   </span>`
+                : `<span class="bg-rose-100 text-rose-800 text-[10px] font-bold px-2 py-0.5 rounded-full inline-flex items-center gap-0.5">
+                    ✗ Kurang
+                   </span>`
+            }
+          </td>
+          <td class="py-3 px-4 text-right font-mono">${Math.round(item.dutyCycle * 100)}%</td>
+          <td class="py-3 px-4 text-right font-mono">${Math.round(item.avgActualWatts)} W</td>
+          <td class="py-3 px-4 text-right font-mono">${item.monthlyKwh.toFixed(1)} kWh</td>
+          <td class="py-3 px-4 text-right font-mono font-bold text-blue-700">${formatCurrency(item.monthlyBill)}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-700">${formatCurrency(item.annualBill)}</td>
+          <td class="py-3 px-4 text-right font-mono text-slate-500">${formatCurrency(item.cost)}</td>
+          <td class="py-3 px-4 text-right font-mono font-bold text-slate-900">${formatCurrency(item.totalYear1Cost)}</td>
+        `;
+
+        comparisonTableBody.appendChild(row);
+      });
+    }
+
+    // -------------------------------------------------------------
+    // UPDATE CHART
+    // -------------------------------------------------------------
+    function updateChart(results, recommendedOption) {
+      if (!chartInstance) return;
+
+      let datasetData = [];
+      let labelText = '';
+      let colors = [];
+
+      results.forEach((item) => {
+        const isRec = item.id === recommendedOption.id;
+        
+        if (currentChartMetric === 'bill') {
+          datasetData.push(Math.round(item.monthlyBill));
+          labelText = 'Tagihan Listrik Bulanan (Rp)';
+          colors.push(isRec ? '#2563eb' : '#93c5fd');
+        } else if (currentChartMetric === 'year1') {
+          datasetData.push(Math.round(item.totalYear1Cost));
+          labelText = 'Total Biaya Tahun Pertama (Unit + Listrik) (Rp)';
+          colors.push(isRec ? '#059669' : '#a7f3d0');
+        } else if (currentChartMetric === 'power') {
+          datasetData.push(Math.round(item.avgActualWatts));
+          labelText = 'Rata-rata Konsumsi Daya Aktif (Watt)';
+          colors.push(isRec ? '#d97706' : '#fde68a');
+        }
+      });
+
+      chartInstance.data.datasets[0].data = datasetData;
+      chartInstance.data.datasets[0].label = labelText;
+      chartInstance.data.datasets[0].backgroundColor = colors;
+      chartInstance.update();
+    }
+
+    // -------------------------------------------------------------
+    // SAVINGS & HACK HIGHLIGHT
+    // -------------------------------------------------------------
+    function updateSavingsNotice(results, recommendedOption, tariff, dailyHours, daysPerMonth) {
+      if (!recommendedOption) return;
+
+      // Calculate the difference for recommended unit between Standard vs Fan
+      const stdDuty = recommendedOption.dutyStandard;
+      const fanDuty = recommendedOption.dutyFan;
+      const fanWatts = parseFloat(sliderFanWatts.value) || 25;
+
+      const stdMonthlyKwh = ((recommendedOption.maxPower * stdDuty * dailyHours) / 1000) * daysPerMonth;
+      const fanMonthlyKwh = (((recommendedOption.maxPower * fanDuty + fanWatts) * dailyHours) / 1000) * daysPerMonth;
+      
+      const stdBill = stdMonthlyKwh * tariff;
+      const fanBill = fanMonthlyKwh * tariff;
+      const monthlySavings = stdBill - fanBill;
+      const pctSavings = ((monthlySavings / stdBill) * 100).toFixed(0);
+
+      if (currentMode === 'fan') {
+        savingsNoticeTitle.textContent = `Mode Hack Aktif! Menghemat ${formatCurrency(monthlySavings)} / Bulan (${pctSavings}%)`;
+        savingsNoticeDesc.textContent = `Pada AC ${recommendedOption.name}, tagihan terpangkas dari ${formatCurrency(stdBill)} menjadi ${formatCurrency(fanBill)}/bln berkat penurunan beban duty cycle kompresor.`;
+        btnToggleHackFromBanner.textContent = 'Kembali ke 26°C Standar';
+        btnToggleHackFromBanner.className = 'px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-900 text-white font-bold text-xs shadow-xs transition shrink-0';
+      } else {
+        savingsNoticeTitle.textContent = `Potensi Hemat: ${formatCurrency(monthlySavings)} / Bulan (${pctSavings}%)`;
+        savingsNoticeDesc.textContent = `Gunakan setelan suhu 28°C + Kipas Angin pada unit ${recommendedOption.name} untuk memangkas tagihan listrik hingga ${formatCurrency(monthlySavings * 12)} per tahun!`;
+        btnToggleHackFromBanner.textContent = 'Aktifkan Hack 28°C';
+        btnToggleHackFromBanner.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-xs transition shrink-0';
+      }
+    }
+
+    // -------------------------------------------------------------
+    // INTERACTION HANDLERS & PRESETS
+    // -------------------------------------------------------------
+    function setMode(mode) {
+      currentMode = mode;
+      if (mode === 'fan') {
+        btnModeFanHack.className = 'flex-1 py-2 px-2 rounded-lg text-xs font-bold transition shadow-xs bg-white text-indigo-900 border border-indigo-200';
+        btnModeStandard.className = 'flex-1 py-2 px-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900';
+        fanSettingsBox.classList.remove('hidden');
+      } else {
+        btnModeStandard.className = 'flex-1 py-2 px-2 rounded-lg text-xs font-bold transition shadow-xs bg-white text-slate-900';
+        btnModeFanHack.className = 'flex-1 py-2 px-2 rounded-lg text-xs font-bold transition text-slate-600 hover:text-slate-900';
+        fanSettingsBox.classList.add('hidden');
+      }
+      calculateSimulations();
+    }
+
+    function toggleHackMode() {
+      setMode(currentMode === 'fan' ? 'standard' : 'fan');
+    }
+
+    function switchChartMetric(metric) {
+      currentChartMetric = metric;
+      const btnBill = document.getElementById('chartTabBill');
+      const btnYear1 = document.getElementById('chartTabYear1');
+      const btnPower = document.getElementById('chartTabPower');
+
+      [btnBill, btnYear1, btnPower].forEach(btn => {
+        btn.className = 'px-3 py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition';
+      });
+
+      if (metric === 'bill') {
+        btnBill.className = 'px-3 py-1.5 rounded-lg bg-white shadow-xs text-blue-700 font-bold transition';
+      } else if (metric === 'year1') {
+        btnYear1.className = 'px-3 py-1.5 rounded-lg bg-white shadow-xs text-emerald-700 font-bold transition';
+      } else if (metric === 'power') {
+        btnPower.className = 'px-3 py-1.5 rounded-lg bg-white shadow-xs text-amber-700 font-bold transition';
+      }
+
+      calculateSimulations();
+    }
+
+    function applyPreset(key) {
+      const p = PRESETS[key];
+      if (!p) return;
+
+      inputLength.value = p.length;
+      inputWidth.value = p.width;
+      inputHeight.value = p.height;
+      sliderHeight.value = p.height;
+      sliderMultiplier.value = p.multiplier;
+      inputWindow.value = p.window;
+      inputOccupants.value = p.occupants;
+      inputElectronics.value = p.electronics;
+
+      // Update button styling
+      document.querySelectorAll('.preset-btn').forEach(b => {
+        b.className = 'preset-btn text-left p-2.5 rounded-xl border border-slate-200 hover:border-blue-400 hover:bg-blue-50/50 transition';
+      });
+      if (window.event && window.event.currentTarget) {
+        window.event.currentTarget.className = 'preset-btn text-left p-2.5 rounded-xl border border-blue-500 bg-blue-50/60 transition';
+      }
+
+      showToast(`Preset "${key.replace('_', ' ').toUpperCase()}" diterapkan!`);
+      calculateSimulations();
+    }
+
+    function setTariff(val, name) {
+      inputTariff.value = val;
+      tariffTag.textContent = name;
+      calculateSimulations();
+    }
+
+    function stepOccupants(step) {
+      const cur = parseInt(inputOccupants.value, 10) || 1;
+      const next = Math.max(1, Math.min(30, cur + step));
+      inputOccupants.value = next;
+      calculateSimulations();
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+
+    function copyTableData() {
+      const length = inputLength.value;
+      const width = inputWidth.value;
+      const btu = resRequiredBTU.textContent;
+      const rec = recPKName.textContent;
+      const tariff = inputTariff.value;
+
+      const text = `=== RINGKASAN SIMULASI PK AC & LISTRIK ===\nRuangan: ${length}m x ${width}m (${resFloorArea.textContent} m²)\nKebutuhan Beban: ${btu} BTU/h\nRekomendasi Kapasitas: ${rec}\nTarif Listrik: Rp ${tariff}/kWh\nMode: ${currentMode === 'fan' ? '28°C + Kipas' : '26°C Standar'}\nSimulasi dibuat via AC Capacity & Electricity Cost Simulator.`;
+      
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Ringkasan simulasi tersalin ke clipboard!');
+      }).catch(() => {
+        showToast('Gagal menyalin ringkasan');
+      });
+    }
+
+    function resetDefaults() {
+      inputLength.value = 4;
+      inputWidth.value = 6;
+      inputHeight.value = 3;
+      sliderHeight.value = 3;
+      sliderMultiplier.value = 600;
+      inputWindow.value = 1000;
+      inputOccupants.value = 2;
+      inputElectronics.value = 500;
+      inputTariff.value = 1444.70;
+      tariffTag.textContent = '1300-2200 VA';
+      sliderHours.value = 10;
+      sliderDays.value = 30;
+      sliderFanWatts.value = 25;
+      inputFanWatts.value = 25;
+      setMode('standard');
+      showToast('Parameter dikembalikan ke nilai awal');
+    }
+
+    // -------------------------------------------------------------
+    // EVENT LISTENERS BINDINGS
+    // -------------------------------------------------------------
+    const inputsToWatch = [
+      inputLength, inputWidth, inputHeight, sliderHeight,
+      sliderMultiplier, inputWindow, inputOccupants, inputElectronics,
+      inputTariff, sliderHours, sliderDays, sliderFanWatts, inputFanWatts
+    ];
+
+    inputsToWatch.forEach(input => {
+      input.addEventListener('input', (e) => {
+        // Handle bidirectional sync for height and fan watts
+        if (e.target === sliderHeight) {
+          inputHeight.value = sliderHeight.value;
+        } else if (e.target === inputHeight) {
+          sliderHeight.value = inputHeight.value;
+        } else if (e.target === sliderFanWatts) {
+          inputFanWatts.value = sliderFanWatts.value;
+        } else if (e.target === inputFanWatts) {
+          sliderFanWatts.value = inputFanWatts.value;
+        }
+        calculateSimulations();
+      });
+    });
+
+    document.getElementById('btnReset').addEventListener('click', resetDefaults);
+    document.getElementById('btnPrint').addEventListener('click', () => {
+      window.print();
+    });
+
+    // Initialize on page load
+    window.addEventListener('DOMContentLoaded', () => {
+      initChart();
+      calculateSimulations();
+    });
+  </script>
+</body>
+</html>
